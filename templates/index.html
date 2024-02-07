@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cifras</title>
+</head>
+
+<body>
+    <h1>Cifras</h1>
+    <form action="/cifra-colunas" method="post">
+        <label for="texto">Texto:</label><br>
+        <textarea name="texto" id="texto" cols="30" rows="10"></textarea><br>
+        <label for="chave">Chave:</label>
+        <input type="number" name="chave" id="chave"><br>
+        <input type="checkbox" name="spaceAllowed" id="spaceAllowed">
+        <label for="spaceAllowed">Permitir espaços</label><br>
+        <input type="checkbox" name="specialCharAllowed" id="specialCharAllowed">
+        <label for="specialCharAllowed">Permitir caracteres especiais</label><br>
+        <input type="checkbox" name="caseSensitive" id="caseSensitive">
+        <label for="caseSensitive">Sensível a maiúsculas/minúsculas</label><br>
+        <input type="submit" value="Cifrar Colunas">
+    </form>
+</body>
+
+</html>
