@@ -9,7 +9,7 @@
 
 <body>
     <h1>Cifras</h1>
-    <form action="/cifra-colunas" method="post">
+    <form id="cifra-colunas-form">
         <label for="texto">Texto:</label><br>
         <textarea name="texto" id="texto" cols="30" rows="10"></textarea><br>
         <label for="chave">Chave:</label>
@@ -20,8 +20,78 @@
         <label for="specialCharAllowed">Permitir caracteres especiais</label><br>
         <input type="checkbox" name="caseSensitive" id="caseSensitive">
         <label for="caseSensitive">Sensível a maiúsculas/minúsculas</label><br>
-        <input type="submit" value="Cifrar Colunas">
+        <input type="button" id="submit-button" value="Cifrar Colunas">
     </form>
+
+    <div id="resultado"></div>
+
+<!-- @app.route('/decifra-colunas', methods=['POST'])
+def decifra_colunas():
+texto = request.form['texto']
+chave = request.form['chave'].strip()
+
+if not chave:
+return jsonify({'error': 'A chave não pode estar vazia'})
+
+if not chave.isdigit():
+return jsonify({'error': 'A chave deve ser um número inteiro'})
+
+chave = int(chave)
+
+decifrado = desencriptar_colunas(texto, chave)
+return jsonify({'decifrado': decifrado}) -->
+
+    <form id="decifra-colunas-form">
+        <label for="texto-decifrado">Texto:</label><br>
+        <textarea name="texto" id="texto-decifrado" cols="30" rows="10"></textarea><br>
+        <label for="chave-decifrado">Chave:</label>
+        <input type="number" name="chave" id="chave-decifrado"><br>
+        <input type="button" id="decifra-colunas-button" value="Decifrar Colunas">
+    </form>
+
+    <div id="resultado-decifrado"></div>
+
+    <script>
+
+        // Evento para encriptar o texto usando a cifra de colunas
+        document.getElementById('submit-button').addEventListener('click', function () {
+            var form_data = new FormData(document.getElementById('cifra-colunas-form'));
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/cifra-colunas', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        alert(response.error);
+                    } else {
+                        document.getElementById('resultado').innerText = response.cifrado;
+                    }
+                }
+            };
+            xhr.send(form_data);
+        });
+
+        // Evento para decifrar o texto usando a cifra de colunas
+        document.getElementById('decifra-colunas-button').addEventListener('click', function () {
+            var form_data = new FormData(document.getElementById('decifra-colunas-form'));
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/decifra-colunas', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        alert(response.error);
+                    } else {
+                        document.getElementById('resultado-decifrado').innerText = response.decifrado;
+                    }
+                }
+            };
+            xhr.send(form_data);
+        });
+        
+    </script>
 </body>
 
 </html>

@@ -1,3 +1,9 @@
+from Crypto.Cipher import DES
+from Crypto.Cipher import AES
+from Crypto.Cipher import Blowfish
+import base64
+from Crypto import Random
+
 # Cifra de Colunas
 
 def encriptar_colunas(texto, chave, isSpaceAllowed=False, isSpecialCharAllowed=False, caseSensitive=False):
@@ -9,18 +15,13 @@ def encriptar_colunas(texto, chave, isSpaceAllowed=False, isSpecialCharAllowed=F
         texto_cifrado += texto[i::chave]
     return texto_cifrado
 
-encriptado_colunas = encriptar_colunas("FUJAM TODOS. Fomos DESCOBERTOS", 3, True, True, True)
-print(f'Encriptado Colunas: {encriptado_colunas}')
-
-def print_matriz(texto_cifrado, chave):
+def print_matriz_colunas(texto_cifrado, chave):
     num_linhas = len(texto_cifrado) // chave
     if len(texto_cifrado) % chave != 0:
         num_linhas += 1
 
     for i in range(0, len(texto_cifrado), num_linhas):
         print(' '.join(texto_cifrado[i:i+num_linhas]))
-
-print_matriz(encriptado_colunas, 3)
 
 def desencriptar_colunas(texto_cifrado, chave):
     num_linhas = len(texto_cifrado) // chave
@@ -32,8 +33,6 @@ def desencriptar_colunas(texto_cifrado, chave):
         texto += texto_cifrado[i::num_linhas]
     return texto
 
-desencriptado_colunas = desencriptar_colunas(encriptado_colunas, 3)
-print(f'Desencriptado Colunas: {desencriptado_colunas}')
 
 # Cifra de Cerca (Rail Fence)
 
@@ -45,9 +44,6 @@ def encriptar_rail_fence(texto, chave, isSpaceAllowed=False, isSpecialCharAllowe
     for i in range(chave):
         texto_cifrado += texto[i::chave]
     return texto_cifrado
-
-encriptado_rail_fence = encriptar_rail_fence("A WIZARD IS NEVER LATE", 2, True, True, True)
-print(f'Encriptado Rail Fence: {encriptado_rail_fence}')
 
 def print_matriz_zigue_zague(texto_cifrado, chave):
     num_colunas = len(texto_cifrado) // chave
@@ -67,7 +63,6 @@ def print_matriz_zigue_zague(texto_cifrado, chave):
             linha += '-'
         print(linha.rstrip(' - '))
 
-print_matriz_zigue_zague(encriptado_rail_fence, 2)
 
 def desencriptar_rail_fence(texto_cifrado, chave):
     num_colunas = len(texto_cifrado) // chave
@@ -79,9 +74,6 @@ def desencriptar_rail_fence(texto_cifrado, chave):
         texto += texto_cifrado[i::num_colunas]
     return texto
 
-desencriptado_rail_fence = desencriptar_rail_fence(encriptado_rail_fence, 2)
-print(f'Desencriptado Rail Fence: {desencriptado_rail_fence}')
-
 # Cifra de Vigenère
 
 def encriptar_vigenere(texto, chave):
@@ -90,14 +82,101 @@ def encriptar_vigenere(texto, chave):
         texto_cifrado += chr((ord(texto[i]) + ord(chave[i % len(chave)]) - 2 * 65) % 26 + 65)
     return texto_cifrado
 
-encriptado_vigenere = encriptar_vigenere("ATACARBASESUL", "LIMAO")
-print(f'Encriptado Vigenere: {encriptado_vigenere}')
-
 def desencriptar_vigenere(texto_cifrado, chave):
     texto = ''
     for i in range(len(texto_cifrado)):
         texto += chr((ord(texto_cifrado[i]) - ord(chave[i % len(chave)]) + 26) % 26 + 65)
     return texto
 
-desencriptado_vigenere = desencriptar_vigenere(encriptado_vigenere, "LIMAO")
-print(f'Desencriptado Vigenere: {desencriptado_vigenere}')
+# Cifra Blowfish
+
+def encriptar_blowfish(texto, chave):
+
+    chave = chave.ljust(16, b'\0')
+
+    iv = Random.new().read(Blowfish.block_size)
+
+    cipher = Blowfish.new(chave, Blowfish.MODE_CBC, iv)
+
+    length = Blowfish.block_size - (len(texto) % Blowfish.block_size)
+    texto += bytes([length]) * length
+
+    texto_cifrado = iv + cipher.encrypt(texto)
+
+    return base64.b64encode(texto_cifrado)
+
+
+def desencriptar_blowfish(texto_cifrado, chave):
+    chave = chave.ljust(16, b'\0')
+
+    texto_cifrado = base64.b64decode(texto_cifrado)
+
+    iv = texto_cifrado[:Blowfish.block_size]
+
+    cipher = Blowfish.new(chave, Blowfish.MODE_CBC, iv)
+
+    plain_text = cipher.decrypt(texto_cifrado[Blowfish.block_size:])
+
+    return plain_text[:-plain_text[-1]]
+
+# Cifra AES
+
+def encriptar_aes(texto, chave):    
+    chave = chave.ljust(16, b'\0')
+
+    iv = Random.new().read(AES.block_size)
+
+    cipher = AES.new(chave, AES.MODE_CBC, iv)
+
+    length = AES.block_size - (len(texto) % AES.block_size)
+    texto += bytes([length]) * length
+
+    texto_cifrado = iv + cipher.encrypt(texto)
+
+    return base64.b64encode(texto_cifrado)
+
+
+def desencriptar_aes(texto_cifrado, chave):
+    chave = chave.ljust(16, b'\0')
+
+    texto_cifrado = base64.b64decode(texto_cifrado)
+
+    iv = texto_cifrado[:AES.block_size]
+
+    cipher = AES.new(chave, AES.MODE_CBC, iv)
+
+    plain_text = cipher.decrypt(texto_cifrado[AES.block_size:])
+
+    return plain_text[:-plain_text[-1]]
+
+# Cifra DES
+
+def encriptar_des(texto, chave):
+    chave = chave.ljust(8, b'\0')
+
+    iv = Random.new().read(DES.block_size)
+
+    cipher = DES.new(chave, DES.MODE_CBC, iv)
+
+    length = DES.block_size - (len(texto) % DES.block_size)
+    texto += bytes([length]) * length
+
+    texto_cifrado = iv + cipher.encrypt(texto)
+
+    return base64.b64encode(texto_cifrado)
+
+
+def desencriptar_des(texto_cifrado, chave):
+    chave = chave.ljust(8, b'\0')
+
+    texto_cifrado = base64.b64decode(texto_cifrado)
+
+    iv = texto_cifrado[:DES.block_size]
+
+    cipher = DES.new(chave, DES.MODE_CBC, iv)
+
+    plain_text = cipher.decrypt(texto_cifrado[DES.block_size:])
+
+    return plain_text[:-plain_text[-1]]
+
+
