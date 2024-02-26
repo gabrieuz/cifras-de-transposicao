@@ -5,54 +5,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cifras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-emphasis: bold;
+            font-size: 16px;
+        }
+
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        #resultado,
+        #resultado-decifrado {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .option-container {
+            display: flex;
+            justify-items: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        hr {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Cifras</h1>
-    <form id="cifra-colunas-form">
-        <label for="texto">Texto:</label><br>
-        <textarea name="texto" id="texto" cols="30" rows="10"></textarea><br>
-        <label for="chave">Chave:</label>
-        <input type="number" name="chave" id="chave"><br>
-        <input type="checkbox" name="spaceAllowed" id="spaceAllowed">
-        <label for="spaceAllowed">Permitir espaços</label><br>
-        <input type="checkbox" name="specialCharAllowed" id="specialCharAllowed">
-        <label for="specialCharAllowed">Permitir caracteres especiais</label><br>
-        <input type="checkbox" name="caseSensitive" id="caseSensitive">
-        <label for="caseSensitive">Sensível a maiúsculas/minúsculas</label><br>
-        <input type="button" id="submit-button" value="Cifrar Colunas">
-    </form>
+    <div class="container">
+        <h1>Cifra de Colunas</h1>
 
-    <div id="resultado"></div>
+        <h2>Encriptar</h2>
+        <hr>
+        <form id="cifra-colunas-form">
+            <label for="texto">Texto:</label>
+            <textarea name="texto" id="texto" cols="30" rows="10"></textarea>
+            <label for="chave">Chave:</label>
+            <input type="number" name="chave" id="chave">
 
-<!-- @app.route('/decifra-colunas', methods=['POST'])
-def decifra_colunas():
-texto = request.form['texto']
-chave = request.form['chave'].strip()
+            <div class="options">
+                <div class="option-container">
+                    <input type="checkbox" name="spaceAllowed" id="spaceAllowed">
+                    <label for="spaceAllowed">Permitir espaços</label>
+                </div>
+                <div class="option-container">
+                    <input type="checkbox" name="specialCharAllowed" id="specialCharAllowed">
+                    <label for="specialCharAllowed">Permitir caracteres especiais</label>
+                </div>
+                <div class="option-container">
+                    <input type="checkbox" name="caseSensitive" id="caseSensitive">
+                    <label for="caseSensitive">Sensível a maiúsculas/minúsculas</label>
+                </div>
+            </div>
 
-if not chave:
-return jsonify({'error': 'A chave não pode estar vazia'})
+            <input type="button" id="submit-button" value="Cifrar Colunas">
+        </form>
 
-if not chave.isdigit():
-return jsonify({'error': 'A chave deve ser um número inteiro'})
+        <div id="resultado"></div>
 
-chave = int(chave)
+        <h2>Decifrar</h2>
+        <hr>
 
-decifrado = desencriptar_colunas(texto, chave)
-return jsonify({'decifrado': decifrado}) -->
+        <form id="decifra-colunas-form">
+            <label for="texto-decifrado">Texto Cifrado:</label>
+            <textarea name="texto" id="texto-decifrado" cols="30" rows="10"></textarea>
+            <label for="chave-decifrado">Chave:</label>
+            <input type="number" name="chave" id="chave-decifrado">
+            <input type="button" id="decifra-colunas-button" value="Decifrar Colunas">
+        </form>
 
-    <form id="decifra-colunas-form">
-        <label for="texto-decifrado">Texto:</label><br>
-        <textarea name="texto" id="texto-decifrado" cols="30" rows="10"></textarea><br>
-        <label for="chave-decifrado">Chave:</label>
-        <input type="number" name="chave" id="chave-decifrado"><br>
-        <input type="button" id="decifra-colunas-button" value="Decifrar Colunas">
-    </form>
-
-    <div id="resultado-decifrado"></div>
+        <div id="resultado-decifrado"></div>
+    </div>
 
     <script>
-
         // Evento para encriptar o texto usando a cifra de colunas
         document.getElementById('submit-button').addEventListener('click', function () {
             var form_data = new FormData(document.getElementById('cifra-colunas-form'));
@@ -90,7 +183,7 @@ return jsonify({'decifrado': decifrado}) -->
             };
             xhr.send(form_data);
         });
-        
+
     </script>
 </body>
 
